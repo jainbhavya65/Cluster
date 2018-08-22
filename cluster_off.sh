@@ -32,25 +32,30 @@ read -p "Enter Option(for down all Just Enter all):" o
          echo "Selected Cluster Name:" $cluster
          pool_list=$(gcloud container  node-pools list --cluster $cluster| awk '{print $1}' | tail -n +2)
          pool_name=$(gcloud container  node-pools describe $pool_list --cluster $cluster | grep compute/v1 | awk -F '/' '{print $11}'|awk -F '-' '{print $2"-"$3"-"$4}')
-         #gcloud container clusters update $cluster  --enable-autoscaling
-         #gcloud container node-pools update $(gcloud container node-pools list --cluster $cluster | awk {'print $1'} | tail -n +2) --cluster $cluster --enable-autorepair
+         gcloud container clusters update $cluster  --no-enable-autoscaling
+         gcloud container node-pools update $(gcloud container node-pools list --cluster $cluster | awk {'print $1'} | tail -n +2) --cluster $cluster --no-enable-autorepair
          nodes_name=$(gcloud compute instances list | awk '{print $1}'| grep -i $pool_name)
           for z in $nodes_name
           do              
 	  echo "==================================================================="
-	  echo " Starting Node" $z
+	  echo " Stoping Node" $z
 	  echo "==================================================================="
-           #gcloud compute instances start $z
+           gcloud compute instances stop $z
           done
    else
-	echo "Selected Cluster Name: ALL cluster are going to down" 
-         #gcloud container clusters update $v  --enable-autoscaling
-         #gcloud container node-pools update $(gcloud container node-pools list --cluster $v | awk {'print $1'} | tail -n +2) --cluster $v  --enable-autorepair
-        node_all=$(gcloud compute instances list | awk '{print $1}' | tail -n +2)
+	echo "Selected Cluster Name: ALL cluster are going to down"
+	for v in $cluster_list
+	do
+         gcloud container clusters update $v  --no-enable-autoscaling
+         gcloud container node-pools update $(gcloud container node-pools list --cluster $v | awk {'print $1'} | tail -n +2) --cluster $v  --no-enable-autorepair
+        done
+         node_all=$(gcloud compute instances list | awk '{print $1}' | tail -n +2)
           for z in $node_all
           do
-	   echo $z
-           #gcloud compute instances start $z
+	   echo "==================================================================="
+	   echo " Stoping Node" $z
+	   echo "==================================================================="
+           gcloud compute instances stop $z
           done
 fi
 rm -f test.txt
