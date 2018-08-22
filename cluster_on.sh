@@ -52,8 +52,10 @@ read -p "Enter Option(for down all Just Enter all):" o
        node_all=$(gcloud compute instances list | awk '{print $1}' | tail -n +2)
           for z in $node_all
           do
-	   echo $z
-           #gcloud compute instances start $z
+	  echo "==================================================================="
+	  echo " Starting Node" $z
+	  echo "==================================================================="
+           gcloud compute instances start $z
           done
 fi
 rm -f test.txt
